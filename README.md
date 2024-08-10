@@ -50,4 +50,4 @@ UNSPLASH_ID="YOUR_API_KEY_HERE"
 
 ## See also
 
-If you're looking for a free wallpaper engine with a lot more features, consider checking out [Octos](https://github.com/underpig1/octos) - HTML Live Wallpaper Engine.
+If you're looking for a free wallpaper engine with a lot more features, consider checking out my other project - [Octos](https://github.com/underpig1/octos): HTML Live Wallpaper Engine.
