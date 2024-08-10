@@ -338,8 +338,15 @@ function Write-Overlay {
         $graphics.DrawImage($image, 0, 0, 1920, 1080)
 
         $brush = $global:overlay_brush
-        $font = new-object System.Drawing.Font("SF Pro", 96, [System.Drawing.FontStyle]::Bold)
-        $subfont = new-object System.Drawing.Font("SF Pro", 18, [System.Drawing.FontStyle]::Bold)
+        $primaryFontName = "SF Pro"
+        $fallbackFontName = "Segoe UI"
+        $primaryFontStyle = [System.Drawing.FontStyle]::Bold
+        $fallbackFontStyle = [System.Drawing.FontStyle]::Regular
+        $primaryFontExists = [System.Drawing.FontFamily]::Families.Name -contains $primaryFontName
+        $fontName = if ($primaryFontExists) { $primaryFontName } else { $fallbackFontName }
+        $fontStyle = if ($primaryFontExists) { $primaryFontStyle } else { $fallbackFontStyle }
+        $font = new-object System.Drawing.Font($fontName, 96, $fontStyle)
+        $subfont = new-object System.Drawing.Font($fontName, 18, $fontStyle)
         $stringFormat = new-object System.Drawing.StringFormat
         $stringFormat.Alignment = [System.Drawing.StringAlignment]::Center
         $stringFormat.LineAlignment = [System.Drawing.StringAlignment]::Center
