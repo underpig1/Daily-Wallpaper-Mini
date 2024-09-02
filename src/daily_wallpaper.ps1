@@ -358,7 +358,7 @@ function Write-Overlay {
         $day = Get-Date -Format "dddd"
         $month = Get-Date -Format "MM"
         $date = Get-Date -UFormat "%e"
-        $graphics.DrawString("$day, $($months[$month.ToString()]) $date", $subfont, $brush, $rect, $stringFormat)
+        $graphics.DrawString("$day, $($months[[int]$month - 1]) $date", $subfont, $brush, $rect, $stringFormat)
 
         $bitmap.Save("$env:temp\\overlay_wallpaper.png", [System.Drawing.Imaging.ImageFormat]::Png)
         $graphics.Dispose()
