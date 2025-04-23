@@ -16,12 +16,24 @@ if ($install -or $uninstall) {
     }
     else {
         if ($install) {
+            $CIMTriggerClass = Get-CimClass -ClassName MSFT_TaskEventTrigger -Namespace Root/Microsoft/Windows/TaskScheduler:MSFT_TaskEventTrigger
+            $wakeTrigger = New-CimInstance -CimClass $CIMTriggerClass -ClientOnly
+            $wakeTrigger.Subscription =
+@"
+<QueryList><Query Id="0" Path="System"><Select Path="System">*[System[Provider[@Name='Kernel-Power'] and EventID=566]]</Select></Query></QueryList>
+"@
+            $wakeTrigger.Enabled = $true
             $Trigger = @(
                 $(New-ScheduledTaskTrigger -AtLogOn),
-                $(New-ScheduledTaskTrigger -AtStartup)
+                $(New-ScheduledTaskTrigger -AtStartup),
+                $wakeTrigger
             )
-            $Action = New-ScheduledTaskAction -Execute $exePath
-            Register-ScheduledTask -TaskName "Daily Wallpaper" -Trigger $Trigger -Action $Action -Force
+            $Action = @(
+                $(New-ScheduledTaskAction -Execute "cmd" -Argument "/c `"taskkill /F /IM daily_wallpaper.exe & timeout /T 5 & start `"`"`"`" ^`"$($exePath)^`"`"")
+                # $(New-ScheduledTaskAction -Execute $exePath)
+            )
+            $Principal = New-ScheduledTaskPrincipal -UserId "NT AUTHORITY\SYSTEM" -LogonType ServiceAccount -RunLevel Highest
+            Register-ScheduledTask -TaskName "Daily Wallpaper" -Trigger $Trigger -Action $Action -Principal $Principal -Force
         }
         else {
             Unregister-ScheduledTask -TaskName "Daily Wallpaper" -Confirm:$false
@@ -214,6 +226,10 @@ $Menu_Exit.add_Click({
         Write-Overlay
         Stop-Process $pid
     })
+
+$ProgressPreference = 'SilentlyContinue'
+$InformationPreference = 'SilentlyContinue'
+$VerbosePreference = 'SilentlyContinue'
 
 function Set-Wallpaper {
     param(
